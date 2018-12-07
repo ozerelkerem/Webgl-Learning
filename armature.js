@@ -24,8 +24,8 @@ var VERTEX_SHADER = [
         'boneMatrix += (u_Bones[int(a_BoneIds[2])]  * a_Weights[2]);',
         'vec4 newVertex = boneMatrix * vec4(a_Position, 1.0);',
         'gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * newVertex;',
-        'v_FragPos = (u_ModelMatrix * vec4(a_Position,1.0)).xyz;',
-        'vec3 tmp = vec3(a_Normal.x, a_Normal.y, a_Normal.z);',
+        'v_FragPos = (u_ModelMatrix * newVertex).xyz;',
+        'vec3 tmp = mat3(boneMatrix) * a_Normal;',
         'v_Normal =  mat3(u_NormalMatrix) * tmp;',
  
         'gl_PointSize = 10.0;',
@@ -64,6 +64,7 @@ var FRAGMENT_SHADER = [
     '}',
 ].join("\n");
 
+
 var ax = 10;
 var ay = 20;
 
@@ -90,7 +91,7 @@ function main(){
         var model = mod;
         model = new Model(model);
         
-        var shad = new Shader(gl);    
+        var shad = new Shader(gl, ['u_ModelMatrix', 'u_ViewMatrix', 'u_ProjectionMatrix', 'u_NormalMatrix', 'u_Bones', 'u_objectColor', 'u_objectColor', 'u_lightColor', 'u_lightPos', 'u_viewPos']);    
         gl.enable(gl.DEPTH_TEST);
         
         var Lx=0,Ly=0,Lz=-50; //Camera position
@@ -116,7 +117,7 @@ function main(){
             
             var joint = model.getJointByName(model.root, "SolKol");
            // var joint2 = model.getJointByName(model.root, "Cone_002");
-            joint.rotateJoint(30, 1, 1, 1);
+          //  joint.rotateJoint(270, 1, 0, 1);
             //joint2.rotateJoint(60, 1, 0, 0);
           
             //return;
